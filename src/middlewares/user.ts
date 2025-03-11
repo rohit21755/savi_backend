@@ -7,7 +7,7 @@ export const isUserAuthenticated = (req: AuthenticatedRequest, res: Response, ne
     if (token) {
         try{
             const decoded = jwt.verify(token, "secret");
-            req.userDetials = decoded;
+            req.userDetails = decoded;
             next();
         }
         catch (error) {

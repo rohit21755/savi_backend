@@ -4,6 +4,7 @@ import paymentRoutes from "./routes/payment";
 import { configDotenv } from "dotenv";
 import userRoute from "./routes/user";
 import adminRoute from "./routes/admin";
+import addressRoutes from "./routes/address";
 
 configDotenv();
 const app = express();
@@ -16,6 +17,8 @@ app.get("/", (req, res) => {
 app.use("/api/payment", paymentRoutes);
 app.use("/api/user", userRoute);
 app.use("/api/admin", adminRoute);
+app.use("api/address", addressRoutes);
+
 
 app.listen(4000, () => {
   console.log("Server is running on port 4000");
