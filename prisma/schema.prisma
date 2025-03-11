@@ -18,6 +18,17 @@ model User {
   cart      Cart?
 
 }
+
+model Address {
+  id        Int  @id @default(autoincrement())
+  address   String
+  city      String
+  state     String
+  zip       Int
+  userId    Int
+  user      User @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
 model Category {
   id        Int      @id @default(autoincrement())
   name      String   @unique
