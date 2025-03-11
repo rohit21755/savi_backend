@@ -16,7 +16,7 @@ model User {
   phoneNumber String
   isAdmin   Boolean  @default(false)
   cart      Cart?
-
+  address   Address[]
 }
 
 model Address {
