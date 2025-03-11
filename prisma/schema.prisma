@@ -22,22 +22,48 @@ model User {
   isAdmin   Boolean  @default(false)
 
 }
-
-model Product {
-  id        Int      @id @default(autoincrement())
-  name      String
-  description String
-  price     Float
-  stock     Int
-  image     String[]
-  salePrice Float
- 
-
-}
-
 model Category {
   id        Int      @id @default(autoincrement())
   name      String   @unique
   gender    String
   type      String[]
+  products  Product[]
 }
+
+model Review {
+  id        Int      @id @default(autoincrement())
+  title     String
+  description String
+  rating    Int
+  productId Int
+  product   Product  @relation(fields: [productId], references: [id])
+}
+model Variants {
+  id        Int      @id @default(autoincrement())
+  color     String
+  image     String[]
+  productId Int
+  product   Product  @relation(fields: [productId], references: [id])
+}
+
+
+model Product {
+  id        Int      @id @default(autoincrement())
+  name      String
+  type      String
+  new     Boolean
+  sale     Boolean
+  originalPrice Float
+  sold     Int
+  quantity Int
+  sizes    String[]
+  description String
+  price     Float
+  stock     Int
+  salePrice Float
+  categoryId Int
+  category  Category @relation(fields: [categoryId], references: [id])
+  reviews   Review[]
+  variants  Variants[]
+}
+

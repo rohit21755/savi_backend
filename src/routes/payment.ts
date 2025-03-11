@@ -17,8 +17,9 @@ router.post('/create-order', async (req: Request, res: Response) => {
         const orderID = uuidv4();
 
         const paymentPayload = {
+            merchantId: "M22W0J3H2JX3F",
             merchantOrderId: orderID,
-            amount: amount * 100, // Convert to paisa
+            amount: amount ,
             expireAfter: 1200,
             metaInfo: {
                 udf1: "additional-information-1",
@@ -56,7 +57,7 @@ router.post('/create-order', async (req: Request, res: Response) => {
             },
         });
 
-        console.log(response.data);
+       
 
         return res.json({
             message: 'Order created successfully',
@@ -69,5 +70,4 @@ router.post('/create-order', async (req: Request, res: Response) => {
     }
 });
 
-// ✅ Ensure this is used properly in `server.ts` or `app.ts`
 export default router;
