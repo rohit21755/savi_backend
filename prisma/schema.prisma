@@ -3,7 +3,6 @@
 generator client {
   provider = "prisma-client-js"
 }
-
 datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
@@ -16,6 +15,7 @@ model User {
   password  String
   phoneNumber String
   isAdmin   Boolean  @default(false)
+  cart      Cart?
 
 }
 model Category {
@@ -61,5 +61,25 @@ model Product {
   category  Category @relation(fields: [categoryId], references: [id])
   reviews   Review[]
   variants  Variants[]
+
 }
+model Cart {
+  id        Int      @id @default(autoincrement())
+  userId    Int      @unique
+  user      User     @relation(fields: [userId], references: [id])
+  cartItems CartItem[]
+}
+
+model CartItem {
+  id        Int      @id @default(autoincrement())
+  cartId    Int
+  cart      Cart     @relation(fields: [cartId], references: [id])
+  productId Int
+  quantity  Int      @default(1)
+  size      String?
+  color     String?
+}
+
+
+
 

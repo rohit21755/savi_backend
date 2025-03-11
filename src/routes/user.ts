@@ -14,7 +14,8 @@ router.post('/signup', async (req, res) => {
     const { name, email, password, phoneNumber } = userSchemaSignUp.parse(req.body);
     console.log(name, email, password, phoneNumber);
     const newPassword = await bcrypt.hash(password, 10);
-    try {const user = await prisma.user.create({
+    try {
+        const user = await prisma.user.create({
         data: {
             name,
             email,
@@ -24,6 +25,7 @@ router.post('/signup', async (req, res) => {
     })
     res.status(200).json({
         message: 'User created successfully',
+
         user: {
             id: user.id,
             name: user.name,
