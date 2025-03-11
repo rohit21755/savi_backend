@@ -1,1 +1,1 @@
-{"root":["./src/index.ts","./src/prisma-client.ts","./src/middlewares/user.ts","./src/routes/payment.ts","./src/routes/user.ts","./src/types/user.ts"],"version":"5.6.3"}
+{"root":["./src/index.ts","./src/prisma-client.ts","./src/controllers/admincontroller.ts","./src/middlewares/user.ts","./src/routes/admin.ts","./src/routes/payment.ts","./src/routes/user.ts","./src/types/user.ts"],"version":"5.8.2"}
