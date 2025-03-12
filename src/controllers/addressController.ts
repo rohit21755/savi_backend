@@ -10,40 +10,33 @@ const addressSchema = z.object({
     zip: z.number()
 });
 
-export const createAddress = async (req: Request, res: Response) => {
+export const createAddress = async (req: AuthenticatedRequest, res: Response): Promise<void> => {
     try { 
-        const { address, state, city, zip } = addressSchema.parse((req as AuthenticatedRequest).body);
+        const { address, state, city, zip } = addressSchema.parse(req.body);
         const userId = req.userDetails?.id;
 
-        if(!userId) {
-            return res.status(401).json({
-                message: 'UserId invalid/missing'
-            });
+        if (!userId) {
+            res.status(401).json({ message: 'UserId invalid/missing' });
+            return;
         }
 
         const newAddress = await prisma.address.create({
-            data: {
-                address,
-                state,
-                city,
-                zip,
-                userId
-            }
-        })
+            data: { address, state, city, zip, userId }
+        });
 
-        res.status(201).json({ message: "Address saved successfully", address: newAddress});
-
+        res.status(201).json({ message: "Address saved successfully", address: newAddress });
     } catch (error) {
-        res.status(400).json({ message: "Failed to save address", error: error})
+        res.status(400).json({ message: "Failed to save address", error });
     }
 };
 
-export const getAddress = async (req: AuthenticatedRequest, res: Response) => {
+export const getAddress = async (req: AuthenticatedRequest, res: Response): Promise<void> => {
     try {
         const userId = req.userDetails?.id;
 
         if(!userId) {
-            return res.status(401).json({ message: "User not authenticated" });
+            res.status(401).json({ message: "User not authenticated" });
+            return 
         }
 
         const addresses = await prisma.address.findMany({
@@ -60,11 +53,12 @@ export const getAddress = async (req: AuthenticatedRequest, res: Response) => {
     }
 };
 
-export const updateAddress = async (req: AuthenticatedRequest, res: Response) => {
+export const updateAddress = async (req: AuthenticatedRequest, res: Response): Promise<void> => {
     try {
         const userId = req.userDetails?.id;
         if (!userId) {
-            return res.status(401).json({ message: "User not authenticated" });
+            res.status(401).json({ message: "User not authenticated" });
+            return 
         }
 
         const { id, address, city, state, zip } = req.body;
@@ -74,7 +68,8 @@ export const updateAddress = async (req: AuthenticatedRequest, res: Response) =>
         });
 
         if(!existingAddress || existingAddress.userId !== userId) {
-            return res.status(403).json({ message: "Unauthorized to update this address" });
+            res.status(403).json({ message: "Unauthorized to update this address" });
+            return 
         }
 
         const updatedAddress = await prisma.address.update({
@@ -93,12 +88,13 @@ export const updateAddress = async (req: AuthenticatedRequest, res: Response) =>
     }
 };
 
-export const deleteAddress = async (req: AuthenticatedRequest, res: Response) => {
+export const deleteAddress = async (req: AuthenticatedRequest, res: Response): Promise<void> => {
     try {
         const userId = req.userDetails?.id;
 
         if(!userId) {
-            return res.status(403).json({ message: "Unauthorized to delete this address" })
+            res.status(403).json({ message: "Unauthorized to delete this address" })
+            return 
         }
 
         const { id } = req.body;
@@ -108,7 +104,8 @@ export const deleteAddress = async (req: AuthenticatedRequest, res: Response) =>
         });
 
         if(!exisitingAddress || exisitingAddress.userId !== userId) {
-            return res.status(403).json({ message: "Unauthorized to delete this address" });
+            res.status(403).json({ message: "Unauthorized to delete this address" });
+            return 
         }
         
         await prisma.address.delete({
