@@ -10,9 +10,9 @@ const addressSchema = z.object({
     zip: z.number()
 });
 
-export const createAddress = async (req: AuthenticatedRequest, res: Response) => {
+export const createAddress = async (req: Request, res: Response) => {
     try { 
-        const { address, state, city, zip } = addressSchema.parse(req.body);
+        const { address, state, city, zip } = addressSchema.parse((req as AuthenticatedRequest).body);
         const userId = req.userDetails?.id;
 
         if(!userId) {

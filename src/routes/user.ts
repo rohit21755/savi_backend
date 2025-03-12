@@ -22,6 +22,7 @@ router.post('/signup', async (req, res) => {
             password : newPassword,
             phoneNumber
         }
+
     })
     res.status(200).json({
         message: 'User created successfully',
