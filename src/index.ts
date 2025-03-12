@@ -17,7 +17,7 @@ app.get("/", (req, res) => {
 app.use("/api/payment", paymentRoutes);
 app.use("/api/user", userRoute);
 app.use("/api/admin", adminRoute);
-app.use("api/address", addressRoutes);
+app.use("/api/address", addressRoutes);
 
 
 app.listen(4000, () => {
