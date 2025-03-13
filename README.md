@@ -1,32 +1,6 @@
 User Authentication & Profile Management
 
-1. User Registration
 
-Route: POST /api/auth/register
-Middleware: None
-Body:
-
-{
-  "name": "string",
-  "email": "string",
-  "password": "string",
-  "phoneNumber": "string"
-}
-
-Response: User created confirmation or error message.
-
-2. User Login
-
-Route: POST /api/auth/login
-Middleware: None
-Body:
-
-{
-  "email": "string",
-  "password": "string"
-}
-
-Response: JWT token & user details.
 
 3. User Profile Update
 
@@ -164,18 +138,6 @@ Response: Payment success or failure.
 
 Admin Features
 
-15. Admin Login
-
-Route: POST /api/admin/login
-Middleware: None
-Body:
-
-{
-  "email": "string",
-  "password": "string"
-}
-
-Response: JWT token & admin details.
 
 16. Add Product
 
