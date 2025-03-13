@@ -1,12 +1,12 @@
 import express from "express";
 import cors from "cors";
 import paymentRoutes from "./routes/payment";
-import { configDotenv } from "dotenv";
+import dotenv from "dotenv";
 import userRoute from "./routes/user";
 import adminRoute from "./routes/admin";
 import addressRoutes from "./routes/address";
 
-configDotenv();
+dotenv.config();
 const app = express();
 app.use(cors());
 app.use(express.json());

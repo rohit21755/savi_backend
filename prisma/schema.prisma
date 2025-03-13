@@ -29,13 +29,7 @@ model Address {
   user      User @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
-model Category {
-  id        Int      @id @default(autoincrement())
-  name      String   @unique
-  gender    String
-  type      String[]
-  products  Product[]
-}
+
 
 model Review {
   id        Int      @id @default(autoincrement())
@@ -43,12 +37,13 @@ model Review {
   description String
   rating    Int
   productId Int
+  userId    Int
   product   Product  @relation(fields: [productId], references: [id])
 }
-model Variants {
-  id        Int      @id @default(autoincrement())
+model Variant {
+  id        Int      @id
   color     String
-  image     String[]
+  images    String[] 
   productId Int
   product   Product  @relation(fields: [productId], references: [id])
 }
@@ -68,10 +63,9 @@ model Product {
   price     Float
   stock     Int
   salePrice Float
-  categoryId Int
-  category  Category @relation(fields: [categoryId], references: [id])
+  category  String
   reviews   Review[]
-  variants  Variants[]
+  variants  Variant[]
 
 }
 model Cart {
