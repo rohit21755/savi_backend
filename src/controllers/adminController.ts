@@ -5,7 +5,7 @@ import jwt from 'jsonwebtoken';
 import bcrypt from 'bcrypt';
 import multer from 'multer';
 import multerS3 from 'multer-s3';
-// import s3 from '../utils/aws';
+import s3 from '../utils/aws';
 const adminSchema = z.object({
     name: z.string().min(3).max(30),
     email: z.string().email(),
@@ -13,19 +13,19 @@ const adminSchema = z.object({
     phoneNumber: z.string()
 });
 
-// export const upload = multer({
-//     storage: multerS3({
-//       s3: s3,
-//       bucket: process.env.AWS_BUCKET_NAME as string,
-//       acl: "public-read",
-//       metadata: function (req, file, cb) {
-//         cb(null, { fieldName: file.fieldname });
-//       },
-//       key: function (req, file, cb) {
-//         cb(null, `variants/${Date.now()}-${file.originalname}`);
-//       },
-//     }),
-//   });
+export const upload = multer({
+    storage: multerS3({
+      s3: s3,
+      bucket: process.env.AWS_BUCKET_NAME as string,
+      acl: "public-read",
+      metadata: function (req, file, cb) {
+        cb(null, { fieldName: file.fieldname });
+      },
+      key: function (req, file, cb) {
+        cb(null, `variants/${Date.now()}-${file.originalname}`);
+      },
+    }),
+  });
 export const createAdmin = async (req: Request, res: Response) => {
     const { name, email, password, phoneNumber } = adminSchema.parse(req.body);
     console.log( name, email, password, phoneNumber );
