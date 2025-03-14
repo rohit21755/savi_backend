@@ -17,6 +17,13 @@ model User {
   isAdmin   Boolean  @default(false)
   cart      Cart?
   address   Address[]
+  wishlist  Wishlist[]
+}
+model Wishlist {
+  id        Int      @id @default(autoincrement())
+  productId Int
+  userId    Int
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
 model Address {
