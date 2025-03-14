@@ -1,82 +1,103 @@
 import { generateUniqueId } from '../utils/random';
-import { Request, Response } from 'express';
+import e, { Request, Response } from 'express';
 import prisma from '../prisma-client';
 export const addProduct = async (req: Request, res: Response) => {
-    try{
-        const {
-            name,
-            type,
-            newProduct,
-            sale,
-            originalPrice,
-            sold,
-            quantity,
-            sizes,
-            description,
-            price,
-            stock,
-            salePrice,
-            categoryId,
-            category,
-            variants,
-          } = req.body;
-      
-          // Generate Unique Product ID
-          const productId = generateUniqueId(name);
-          const parsedSizes = JSON.parse(sizes);
-          const parsedVariants = JSON.parse(variants);
-      
-          // Attach images to variants
-          if (req.files) {
-            let fileIndex = 0; // Track files uploaded for correct mapping
-            //@ts-ignore
-            req.files.forEach((file: Express.MulterS3.File) => {
-              const variantIndex = Math.floor(fileIndex / 3); // Assuming 3 images per variant
-              if (parsedVariants[variantIndex]) {
-                if (!parsedVariants[variantIndex].image) {
-                  parsedVariants[variantIndex].image = [];
-                }
-                parsedVariants[variantIndex].image.push(file.location);
-              }
-              fileIndex++;
-            });
-          }
-      
-          // Add Unique IDs to Variants
-          const variantData = parsedVariants.map((variant: any) => ({
-            uuid: generateUniqueId(name, variant.color),
-            color: variant.color,
-            image: variant.image || [],
-          }));
-      
-          // Create Product in DB
-          const product = await prisma.product.create({
-            data: {
-            
-              name,
-              type,
-              new: JSON.parse(newProduct),
-              sale: JSON.parse(sale),
-              originalPrice: parseFloat(originalPrice),
-              sold: parseInt(sold),
-              quantity: parseInt(quantity),
-              sizes: parsedSizes,
-              description,
-              price: parseFloat(price),
-              stock: parseInt(stock),
-              salePrice: parseFloat(salePrice),
-              category,
-              variants: {
-                create: variantData,
-              },
-            },
-            include: { variants: true },
-          });
-      
-          res.status(201).json({ message: "Product created successfully", product });
+    try {
+      const {
+        name,
+        type,
+        newProduct,
+        sale,
+        originalPrice,
+        sold,
+        quantity,
+        sizes,
+        description,
+        price,
+        stock,
+        salePrice,
+        category,
+      } = req.body;
+  
+    //   const productId = generateUniqueId(name);
+    //   const parsedSizes = JSON.parse(sizes || "[]");
+    //   const parsedVariants = JSON.parse(variants || "[]");
+  
+    //   const variantImagesMap = new Map<number, string[]>();
+  
+    //   if (req.files) {
+    //     (req.files as Express.MulterS3.File[]).forEach((file) => {
+    //       const variantIndex = parseInt(file.metadata?.variantIndex) || 0;
+    //       const currentImages = variantImagesMap.get(variantIndex) || [];
+    //       currentImages.push(file.location);
+    //       variantImagesMap.set(variantIndex, currentImages);
+    //     });
+    //   }
+  
+    //   parsedVariants.forEach((variant: any, index: number) => {
+    //     variant.images = variantImagesMap.get(index) || [];
+    //   });
+  
+    //   const variantData = parsedVariants.map((variant: any) => ({
+    //     color: variant.color,
+    //     images: variant.images || [],
+    //   }));
+  
+      const product = await prisma.product.create({
+        data: {
+          name,
+          type,
+          new: newProduct,
+          sale: sale,
+          originalPrice: parseFloat(originalPrice) || 0,
+          sold: parseInt(sold) || 0,
+          quantity: parseInt(quantity) || 0,
+          sizes: sizes,
+          description,
+          price: parseFloat(price) || 0,
+          stock: parseInt(stock) || 0,
+          salePrice: parseFloat(salePrice) || 0,
+          category,
+    
+        },
+        include: { variants: true },
+      });
+  
+      res.status(201).json({ message: "Product created successfully", product });
+    } catch (error) {
+      console.error("Error creating product:", error);
+      res.status(500).json({ error: "Internal server error" });
+    }
+  };
+  export const addProductVariant = async (req: Request, res: Response): Promise<void> => {
+    try {
+            const { productId , variantColor } = req.body;
+            if (!req.files || (req.files as Express.MulterS3.File[]).length === 0) {
+                res.status(400).json({ message: "No files uploaded" });
+                return
+            }
+            const uploadedImages = (req.files as Express.MulterS3.File[]).map(
+                (file) => file.location
+              );
+              await prisma.variant.create({
+                data: {
+                  color: variantColor,
+                  images: uploadedImages,
+                  productId: Number(productId),
+                },
+              });
+              console.log("Uploaded Image URLs:", uploadedImages);
+              res.json({
+                message: "Variant added successfully",
+                productId,
+                variantColor,
+                images: uploadedImages,
+              });
     }
     catch (error) {
-        console.error("Error creating product:", error);
-        res.status(500).json({ error: "Internal server error" });
+        console.error("Error in addProductVariant:", error);
+        res.status(500).json({ message: "Server error", error: error });
     }
-}
+    
+  }
+  

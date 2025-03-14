@@ -1,5 +1,5 @@
 import express, {Request} from "express";
-import { addProduct } from "../controllers/productController";
+import { addProduct, addProductVariant } from "../controllers/productController";
 import { isAdminAuthenticated } from "../middlewares/admin";
 import multer from "multer";
 import multerS3 from "multer-s3";
@@ -11,20 +11,23 @@ const upload = multer({
     storage: multerS3({
       s3: s3 as unknown as S3,
       bucket: process.env.AWS_BUCKET_NAME as string,
-      acl: "public-read",
       metadata: (req, file, cb) => {
-        cb(null, { fieldName: file.fieldname });
+        const { variantIndex } = (req as Request).body;
+        cb(null, { fieldName: file.fieldname, variantIndex: variantIndex || "0" }); 
       },
       key: (req, file, cb) => {
         const { productName, variantColor } = (req as Request).body;
-        const productId = generateUniqueId(productName); 
-        const variantId = generateUniqueId(productName, variantColor); 
-        const fileExtension = file.originalname.split(".").pop(); 
-  
-        cb(null, `${productId}/${variantId}/${Date.now()}.${fileExtension}`); 
+        console.log(productName, variantColor);
+        const uniqueFolderName = generateUniqueId(productName);
+        const uniqueFolderVariantName = generateUniqueId(productName, variantColor);
+        console.log(uniqueFolderName, uniqueFolderVariantName);
+        const fileExtension = file.originalname.split(".").pop()
+        cb(null, `${uniqueFolderName}/${variantColor}/${uniqueFolderVariantName}.${fileExtension}`);
       },
     }),
   });
-router.post("/add", isAdminAuthenticated, upload.array("images", 7), addProduct);
+  
+router.post("/add", addProduct);
+router.post("/add-variant",upload.array("variants", 5), addProductVariant);
 
 export default router;

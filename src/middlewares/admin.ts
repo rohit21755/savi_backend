@@ -6,7 +6,7 @@ export const isAdminAuthenticated = (req: Request, res: Response, next: NextFunc
     if (token) {
         try{
             const decoded = jwt.verify(token, "secret");
-            (req as AuthenticatedRequest).userDetails = decoded;
+            
             next();
         }
         catch (error) {
@@ -21,3 +21,4 @@ export const isAdminAuthenticated = (req: Request, res: Response, next: NextFunc
         });
     }
 };
+

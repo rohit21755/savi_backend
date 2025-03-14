@@ -7,6 +7,8 @@ import { v4 as uuidv4 } from "uuid";
  * @returns {string} Unique ID
  */
 export function generateUniqueId(name: string, color?: string): string {
+    console.log(name);
+    console.log(color);
   const sanitizedName = name.replace(/\s+/g, "-").toLowerCase(); // Replace spaces with dashes
   const uniqueId = uuidv4().split("-")[0]; // Extract first segment of UUID
 
