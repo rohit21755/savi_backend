@@ -48,7 +48,7 @@ model Review {
   product   Product  @relation(fields: [productId], references: [id])
 }
 model Variant {
-  id        Int      @id
+  id        Int      @id @default(autoincrement())
   color     String
   images    String[] 
   productId Int
