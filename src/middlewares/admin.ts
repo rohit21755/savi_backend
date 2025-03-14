@@ -1,7 +1,7 @@
 import jwt from "jsonwebtoken";
 import { Request, Response, NextFunction } from "express";
 import { AuthenticatedRequest } from "../types/User";
-export const isUserAuthenticated = (req: Request, res: Response, next: NextFunction) => {
+export const isAdminAuthenticated = (req: Request, res: Response, next: NextFunction) => {
     const token = req.headers.authorization;
     if (token) {
         try{
