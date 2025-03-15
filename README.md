@@ -18,90 +18,17 @@ Response: Updated user details.
 
 Product & Shopping Features
 
-4. Get All Products
+4. get product by filters
+see the image
+![Screenshot 2025-03-15 at 9 22 09 AM](https://github.com/user-attachments/assets/ce7b6211-258d-4a69-bfeb-31a42f9a568b)
 
-Route: GET /api/products
-Middleware: None
-Query Parameters (Optional):
 
-categoryId (integer) - Filter by category
 
-sale (boolean) - Filter by sale items
 
-new (boolean) - Filter by new arrivals
 
-minPrice, maxPrice (float) - Price range filter
 
-5. Get Single Product
 
-Route: GET /api/products/:id
-Middleware: None
-Response: Product details.
 
-6. Add to Cart
-
-Route: POST /api/cart
-Middleware: authMiddleware
-Body:
-
-{
-  "productId": "integer",
-  "quantity": "integer"
-}
-
-Response: Cart updated confirmation.
-
-7. View Cart
-
-Route: GET /api/cart
-Middleware: authMiddleware
-Response: Cart details.
-
-8. Remove from Cart
-
-Route: DELETE /api/cart/:id
-Middleware: authMiddleware
-Response: Cart updated confirmation.
-
-9. Wishlist Management
-
-Route: POST /api/wishlist
-Middleware: authMiddleware
-Body:
-
-{
-  "productId": "integer"
-}
-
-Response: Wishlist updated.
-
-10. Like/Dislike Product
-
-Route: POST /api/products/like
-Middleware: authMiddleware
-Body:
-
-{
-  "productId": "integer",
-  "like": "boolean"
-}
-
-Response: Success message.
-
-11. Share Product
-
-Route: POST /api/products/share
-Middleware: authMiddleware
-Body:
-
-{
-  "productId": "integer",
-  "platform": "string"
-}
-
-Response: Share link.
-
-Order & Payment
 
 12. Place an Order
 
@@ -139,25 +66,6 @@ Response: Payment success or failure.
 Admin Features
 
 
-16. Add Product
-
-Route: POST /api/admin/product
-Middleware: adminAuthMiddleware
-Body:
-
-{
-  "name": "string",
-  "type": "string",
-  "originalPrice": "float",
-  "sale": "boolean",
-  "salePrice": "float",
-  "quantity": "integer",
-  "sizes": ["string"],
-  "description": "string",
-  "categoryId": "integer"
-}
-
-Response: Product added confirmation.
 
 17. Remove Product
 
@@ -192,28 +100,3 @@ Response: Order confirmation message.
 
 Additional Features
 
-21. Filter Products
-
-Route: GET /api/products/filter
-Middleware: None
-Query Parameters:
-
-categoryId (integer)
-
-sale (boolean)
-
-minPrice, maxPrice (float)
-
-new (boolean)
-
-Response: Filtered product list.
-
-Middleware
-
-authMiddleware: Ensures the user is authenticated.
-
-adminAuthMiddleware: Ensures the user is an admin.
-
-validateRequestMiddleware: Validates request body data.
-
-This API documentation provides all the required endpoints for both user and admin functionalities, ensuring a complete backend system for the clothing eCommerce platform.
