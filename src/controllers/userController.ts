@@ -3,6 +3,7 @@ import  prisma  from '../prisma-client';
 import { z } from 'zod';
 import  jwt  from 'jsonwebtoken';
 import bcrypt from 'bcrypt';
+import { AuthenticatedRequest } from "../types/User";
 const userSchemaSignUp = z.object({
     name: z.string().min(3).max(30),
     email: z.string().email(),
@@ -81,5 +82,30 @@ export const loginUser = async (req: Request, res: Response) => {
             message: 'User login failed',
             error
         })
+    }
+}
+
+export const addReview = async (req: AuthenticatedRequest, res: Response): Promise<void> => {
+    try {
+        const { title, description, rating, email, pruductId } = req.body;
+        const userId   = req.userDetails?.id;
+        if (!userId) {
+            res.status(401).json({ message: "User not authenticated" });
+            return
+        }
+        const review = await prisma.review.create({
+            data: {
+                title,
+                description,
+                rating,
+                productId: pruductId,
+                userId
+            }
+        })
+        res.status(200).json({ message: "Review added successfully", review });
+    }
+    catch (error) {
+        res.status(400).json({ message: "Failed to add review", error: error instanceof Error ? error.message : "An unknown error occurred" });
+
     }
 }
