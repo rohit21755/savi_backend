@@ -100,4 +100,27 @@ export const addProduct = async (req: Request, res: Response) => {
     }
     
   }
+
+  export const getAllProducts = async (req: Request, res: Response) => {
+    try {
+      const products = await prisma.product.findMany();
+      res.status(200).json({ products });
+    } catch (error) {
+      res.status(500).json({ error: "Internal server error" });
+    }
+  };
+
+  export const getAllReviews = async (req: Request, res: Response) => {
+    try {
+      const productId = req.params.id;
+      const reviews = await prisma.review.findMany({
+        where: {
+          productId: Number(productId),
+        },
+      });
+      res.status(200).json({ reviews });
+    } catch (error) {
+      res.status(500).json({ error: "Internal server error" });
+    }
+  }
   
