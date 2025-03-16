@@ -1,97 +1,92 @@
-
-
 generator client {
   provider = "prisma-client-js"
 }
+
 datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
 }
 
 model User {
-  id        Int      @id @default(autoincrement())
-  name      String
-  email     String   @unique
-  password  String
+  id          Int        @id @default(autoincrement())
+  name        String
+  email       String     @unique
+  password    String
   phoneNumber String
-  isAdmin   Boolean  @default(false)
-  cart      Cart?
-  address   Address[]
-  wishlist  Wishlist[]
-}
-model Wishlist {
-  id        Int      @id @default(autoincrement())
-  productId Int
-  userId    Int
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  isAdmin     Boolean    @default(false)
+  address     Address[]
+  cart        Cart?
+  wishlist    Wishlist[]
 }
 
-model Address {
+model Wishlist {
   id        Int  @id @default(autoincrement())
-  address   String
-  city      String
-  state     String
-  zip       Int
+  productId Int
   userId    Int
   user      User @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
-
+model Address {
+  id      Int    @id @default(autoincrement())
+  address String
+  city    String
+  state   String
+  zip     Int
+  userId  Int
+  user    User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
 
 model Review {
-  id        Int      @id @default(autoincrement())
-  title     String
+  id          Int     @id @default(autoincrement())
+  title       String
   description String
-  rating    Int
-  productId Int
-  userId    Int
-  product   Product  @relation(fields: [productId], references: [id])
+  rating      Int
+  productId   Int
+  userId      Int
+  product     Product @relation(fields: [productId], references: [id])
 }
+
 model Variant {
   id        Int      @id @default(autoincrement())
   color     String
-  images    String[] 
+  images    String[]
   productId Int
   product   Product  @relation(fields: [productId], references: [id])
 }
 
-
 model Product {
-  id        Int      @id @default(autoincrement())
-  name      String
-  type      String
-  new     Boolean
-  sale     Boolean
+  id            Int       @id @default(autoincrement())
+  name          String
+  description   String
+  price         Float
+  stock         Int
+  salePrice     Float
+  new           Boolean
   originalPrice Float
-  sold     Int
-  quantity Int
-  sizes    String[]
-  description String
-  price     Float
-  stock     Int
-  salePrice Float
-  category  String
-  reviews   Review[]
-  variants  Variant[]
-
+  quantity      Int
+  sale          Boolean
+  sizes         String[]
+  sold          Int
+  type          String
+  category      String
+  reviews       Review[]
+  variants      Variant[]
+  luxury        Boolean  @default(false)
 }
+
 model Cart {
-  id        Int      @id @default(autoincrement())
-  userId    Int      @unique
-  user      User     @relation(fields: [userId], references: [id])
+  id        Int        @id @default(autoincrement())
+  userId    Int        @unique
+  user      User       @relation(fields: [userId], references: [id])
   cartItems CartItem[]
 }
 
 model CartItem {
-  id        Int      @id @default(autoincrement())
+  id        Int     @id @default(autoincrement())
   cartId    Int
-  cart      Cart     @relation(fields: [cartId], references: [id])
   productId Int
-  quantity  Int      @default(1)
+  quantity  Int     @default(1)
   size      String?
   color     String?
+  cart      Cart    @relation(fields: [cartId], references: [id])
 }
-
-
-
-
