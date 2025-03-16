@@ -67,13 +67,13 @@ Admin Features
 
 
 
-17. Remove Product
+17. Remove Product and remove variant (both are different routes)
 
 Route: DELETE /api/admin/product/:id
 Middleware: adminAuthMiddleware
 Response: Product deleted confirmation.
 
-18. Put Product on Sale
+18. Put Product on Sale and remove sale
 
 Route: PUT /api/admin/product/sale/:id
 Middleware: adminAuthMiddleware
@@ -99,4 +99,6 @@ Middleware: adminAuthMiddleware
 Response: Order confirmation message.
 
 Additional Features
+
+21. change order Staus
 
