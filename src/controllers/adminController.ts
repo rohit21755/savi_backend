@@ -175,7 +175,7 @@ export const updateProductSale = async (req: Request, res: Response): Promise<vo
             where: { id: productId },
             data: {
                 sale,
-                salePrice: sale ? salePrice : null
+                salePrice: sale ? salePrice : undefined
             }
         });
 
