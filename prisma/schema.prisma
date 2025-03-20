@@ -90,3 +90,12 @@ model CartItem {
   color     String?
   cart      Cart    @relation(fields: [cartId], references: [id])
 }
+
+model Token {
+  id    Int    @id @default(autoincrement())
+  Token String
+  EncryptedToken String
+  issuedAt BigInt
+  expiresAt BigInt
+  sessionExpiredAt BigInt
+}
