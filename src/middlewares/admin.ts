@@ -1,24 +1,30 @@
 import jwt from "jsonwebtoken";
 import { Request, Response, NextFunction } from "express";
 import { AuthenticatedRequest } from "../types/User";
-export const isAdminAuthenticated = (req: Request, res: Response, next: NextFunction) => {
-    const token = req.headers.authorization;
-    if (token) {
-        try{
-            const decoded = jwt.verify(token, "secret");
-            
-            next();
+import prisma from "../prisma-client";
+
+export const isAdminAuthenticated = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+    try {
+        const token = req.headers.authorization?.split(" ")[1];
+
+        if (!token) {
+            res.status(401).json({ message: "Unauthorized: No token provided" });
+            return;
         }
-        catch (error) {
-            res.status(401).json({
-                message: "User not authenticated",
-            });
+
+        const decoded = jwt.verify(token, process.env.JWT_SECRET as string) as { id: number };
+
+        const user = await prisma.user.findUnique({ where: { id: decoded.id } });
+
+        if (!user || !user.isAdmin) {
+            res.status(403).json({ message: "Forbidden: Admin access required" });
+            return;
         }
-        
-    } else {
-        res.status(401).json({
-            message: "User not authenticated",
-        });
+
+        (req as AuthenticatedRequest).userDetails = { id: user.id, isAdmin: user.isAdmin };
+        next();
+    } catch (error) {
+        res.status(401).json({ message: "Unauthorized: Invalid token" });
+        return;
     }
 };
-

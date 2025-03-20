@@ -93,3 +93,51 @@ export const loginAdmin = async (req: Request, res: Response) => {
         })
     }
 }
+
+export const deleteProduct = async (req: Request, res: Response): Promise<void> => {
+    try {
+        const productId = parseInt(req.params.id);
+
+        if (isNaN(productId)) {
+            res.status(400).json({ message: "Invalid product ID" });
+            return;
+        }
+
+        const product = await prisma.product.findUnique({ where: { id: productId } });
+
+        if (!product) {
+            res.status(404).json({ message: "Product not found" });
+            return;
+        }
+
+        await prisma.product.delete({ where: { id: productId } });
+
+        res.status(200).json({ message: "Product deleted successfully" });
+    } catch (error) {
+        res.status(500).json({ message: "Failed to delete product", error: error instanceof Error ? error.message : error });
+    }
+};
+
+export const deleteVariant = async (req: Request, res: Response): Promise<void> => {
+    try {
+        const variantId = parseInt(req.params.id);
+
+        if (isNaN(variantId)) {
+            res.status(400).json({ message: "Invalid variant ID" });
+            return;
+        }
+
+        const variant = await prisma.variant.findUnique({ where: { id: variantId } });
+
+        if (!variant) {
+            res.status(404).json({ message: "Variant not found" });
+            return;
+        }
+
+        await prisma.variant.delete({ where: { id: variantId } });
+
+        res.status(200).json({ message: "Variant deleted successfully" });
+    } catch (error) {
+        res.status(500).json({ message: "Failed to delete variant", error: error instanceof Error ? error.message : error });
+    }
+};

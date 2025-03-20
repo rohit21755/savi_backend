@@ -109,3 +109,58 @@ export const addReview = async (req: AuthenticatedRequest, res: Response): Promi
 
     }
 }
+
+export const updateProfile = async (req: AuthenticatedRequest, res: Response): Promise<void> => {
+    try {
+        const userId = req.userDetails?.id;
+
+        if (!userId) {
+            res.status(401).json({ message: "User not authenticated" });
+            return;
+        }
+
+        const updateProfileSchema = z.object({
+            name: z.string().min(3).max(30).optional(),
+            phoneNumber: z.string().optional(),
+            address: z.string().optional()
+        });
+
+        const validatedData = updateProfileSchema.parse(req.body);
+
+        const updateObject: any = {
+            name: validatedData.name,
+            phoneNumber: validatedData.phoneNumber
+        };
+
+        if (validatedData.address) {
+            updateObject.address = {
+                updateMany: {
+                    where: { userId },
+                    data: { address: validatedData.address }
+                }
+            };
+        }
+
+        const updatedUser = await prisma.user.update({
+            where: { id: userId },
+            data: updateObject,
+            include: { address: true }
+        });
+
+        res.status(200).json({
+            message: "Profile updated successfully",
+            user: {
+                id: updatedUser.id,
+                name: updatedUser.name,
+                email: updatedUser.email,
+                phoneNumber: updatedUser.phoneNumber,
+                address: updatedUser.address.map((addr: { address: string }) => addr.address)
+            }
+        });
+    } catch (error) {
+        res.status(400).json({
+            message: "Profile update failed",
+            error: error instanceof Error ? error.message : "An unknown error occurred on backend"
+        });
+    }
+};
