@@ -68,7 +68,7 @@ model Product {
   sizes         String[]
   sold          Int
   type          String
-  category      String
+  category      String[]
   reviews       Review[]
   variants      Variant[]
   luxury        Boolean  @default(false)
