@@ -71,7 +71,7 @@ export const addProduct = async (req: Request, res: Response) => {
   };
   export const addProductVariant = async (req: Request, res: Response): Promise<void> => {
     try {
-            const { productId , variantColor } = req.body;
+            const { productId , variantColor, material } = req.body;
             if (!req.files || (req.files as Express.MulterS3.File[]).length === 0) {
                 res.status(400).json({ message: "No files uploaded" });
                 return
@@ -82,6 +82,7 @@ export const addProduct = async (req: Request, res: Response) => {
               await prisma.variant.create({
                 data: {
                   color: variantColor,
+                  material: material || "Unknown",
                   images: uploadedImages,
                   productId: Number(productId),
                 },
