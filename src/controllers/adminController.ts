@@ -141,3 +141,49 @@ export const deleteVariant = async (req: Request, res: Response): Promise<void> 
         res.status(500).json({ message: "Failed to delete variant", error: error instanceof Error ? error.message : error });
     }
 };
+
+const saleSchema = z.object({
+    sale: z.boolean(),
+    salePrice: z.number().positive()
+});
+
+export const updateProductSale = async (req: Request, res: Response): Promise<void> => {
+    try {
+        const productId = parseInt(req.params.id);
+
+        if (isNaN(productId)) {
+            res.status(400).json({ message: "Invalid product ID" });
+            return;
+        }
+
+        const validatedData = saleSchema.safeParse(req.body);
+        if (!validatedData.success) {
+            res.status(400).json({ message: "Invalid request data", error: validatedData.error.errors });
+            return;
+        }
+
+        const { sale, salePrice } = validatedData.data;
+
+        const product = await prisma.product.findUnique({ where: { id: productId } });
+
+        if (!product) {
+            res.status(404).json({ message: "Product not found" });
+            return;
+        }
+
+        const updatedProduct = await prisma.product.update({
+            where: { id: productId },
+            data: {
+                sale,
+                salePrice: sale ? salePrice : null
+            }
+        });
+
+        res.status(200).json({
+            message: `Product ${sale ? "put on sale" : "sale removed"} successfully`,
+            product: updatedProduct
+        });
+    } catch (error) {
+        res.status(500).json({ message: "Failed to update product sale", error: error instanceof Error ? error.message : error });
+    }
+};
