@@ -49,9 +49,9 @@ model Review {
 model Variant {
   id        Int      @id @default(autoincrement())
   color     String
-  material  String
   images    String[]
   productId Int
+  material  String
   product   Product  @relation(fields: [productId], references: [id])
 }
 
@@ -69,10 +69,10 @@ model Product {
   sizes         String[]
   sold          Int
   type          String
+  luxury        Boolean   @default(false)
   category      String[]
   reviews       Review[]
   variants      Variant[]
-  luxury        Boolean  @default(false)
 }
 
 model Cart {
@@ -93,10 +93,10 @@ model CartItem {
 }
 
 model Token {
-  id    Int    @id @default(autoincrement())
-  Token String
-  EncryptedToken String
-  issuedAt BigInt
-  expiresAt BigInt
+  id               Int    @id @default(autoincrement())
+  Token            String
+  EncryptedToken   String
+  issuedAt         BigInt
+  expiresAt        BigInt
   sessionExpiredAt BigInt
 }

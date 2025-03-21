@@ -71,36 +71,37 @@ export const addProduct = async (req: Request, res: Response) => {
   };
   export const addProductVariant = async (req: Request, res: Response): Promise<void> => {
     try {
-            const { productId , variantColor, material } = req.body;
-            if (!req.files || (req.files as Express.MulterS3.File[]).length === 0) {
-                res.status(400).json({ message: "No files uploaded" });
-                return
-            }
-            const uploadedImages = (req.files as Express.MulterS3.File[]).map(
-                (file) => file.location
-              );
-              await prisma.variant.create({
-                data: {
-                  color: variantColor,
-                  material: material || "Unknown",
-                  images: uploadedImages,
-                  productId: Number(productId),
-                },
-              });
-              console.log("Uploaded Image URLs:", uploadedImages);
-              res.json({
-                message: "Variant added successfully",
-                productId,
-                variantColor,
-                images: uploadedImages,
-              });
+      const { productId, variantColor, material } = req.body;
+  
+      if (!req.files || (req.files as Express.MulterS3.File[]).length === 0) {
+        res.status(400).json({ message: "No files uploaded" });
+        return;
+      }
+  
+      const uploadedImages = (req.files as Express.MulterS3.File[]).map((file) => file.location);
+  
+      await prisma.variant.create({
+        data: {
+          color: variantColor,
+          material: material || "Unknown",
+          images: uploadedImages,
+          productId: Number(productId),
+        },
+      });
+  
+      console.log("Uploaded Image URLs:", uploadedImages);
+  
+      res.json({
+        message: "Variant added successfully",
+        productId,
+        variantColor,
+        images: uploadedImages,
+      });
+    } catch (error) {
+      console.error("Error in addProductVariant:", error);
+      res.status(500).json({ message: "Server error", error });
     }
-    catch (error) {
-        console.error("Error in addProductVariant:", error);
-        res.status(500).json({ message: "Server error", error: error });
-    }
-    
-  }
+  };
 
   export const getAllProducts = async (req: Request, res: Response) => {
     try {

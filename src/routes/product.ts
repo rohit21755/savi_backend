@@ -14,18 +14,19 @@ const upload = multer({
     s3: s3 as unknown as S3,
     bucket: process.env.AWS_BUCKET_NAME as string,
     metadata: (req, file, cb) => {
-      const { variantIndex } = (req as Request).body as { variantIndex?: string };
-      cb(null, { fieldName: file.fieldname, variantIndex: variantIndex || "0" });
+      cb(null, { fieldName: file.fieldname });
     },
     key: (req, file, cb) => {
-      const { productId, productName, variantColor } = (req as Request).body as { productId: string; productName: string; variantColor: string };
-      
+      const { productId, productName, variantColor } = (req as Request).body as {
+        productId: string;
+        productName: string;
+        variantColor: string;
+      };
       const productFolder = `${productName}-${productId}`;
       const fileExtension = file.originalname.split(".").pop();
-      const uniqueFileName = `${imageCounter++}.${fileExtension}`; // Sequential naming
-
+      const uniqueFileName = `${Date.now()}-${imageCounter++}.${fileExtension}`;
+      
       console.log("Uploading to:", `${productFolder}/${variantColor}/${uniqueFileName}`);
-
       cb(null, `${productFolder}/${variantColor}/${uniqueFileName}`);
     },
   }),
