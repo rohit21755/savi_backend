@@ -91,7 +91,7 @@ export const addProduct = async (req: Request, res: Response) => {
   
       console.log("Uploaded Image URLs:", uploadedImages);
   
-      res.json({
+      res.status(200).json({
         message: "Variant added successfully",
         productId,
         variantColor,
@@ -105,7 +105,9 @@ export const addProduct = async (req: Request, res: Response) => {
 
   export const getAllProducts = async (req: Request, res: Response) => {
     try {
-      const products = await prisma.product.findMany();
+      const products = await prisma.product.findMany({
+        include: { variants: true },
+      });
       res.status(200).json({ products });
     } catch (error) {
       res.status(500).json({ error: "Internal server error" });
