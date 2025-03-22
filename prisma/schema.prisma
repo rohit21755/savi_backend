@@ -61,6 +61,7 @@ model Product {
   description   String
   price         Float
   stock         Int
+  gender        String  @default("men")
   salePrice     Float
   new           Boolean
   originalPrice Float
