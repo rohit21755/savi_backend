@@ -48,7 +48,8 @@ export const loginUser = async (req: Request, res: Response) => {
         const user = await prisma.user.findUnique({
             where:{
                 email
-            }
+            },
+            include: { address: true, }
         })
         if(!user){
             res.status(400).json({
@@ -66,7 +67,8 @@ export const loginUser = async (req: Request, res: Response) => {
                         id: user.id,
                         name: user.name,
                         email: user.email,
-                        phoneNumber: user.phoneNumber
+                        phoneNumber: user.phoneNumber,
+                        
                     }
                 })
             }
@@ -99,7 +101,7 @@ export const addReview = async (req: AuthenticatedRequest, res: Response): Promi
                 description,
                 rating,
                 productId: pruductId,
-                userId
+                userId,
             }
         })
         res.status(200).json({ message: "Review added successfully", review });

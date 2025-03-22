@@ -106,7 +106,7 @@ export const addProduct = async (req: Request, res: Response) => {
   export const getAllProducts = async (req: Request, res: Response) => {
     try {
       const products = await prisma.product.findMany({
-        include: { variants: true },
+        include: { variants: true, reviews: true },
       });
       res.status(200).json({ products });
     } catch (error) {
