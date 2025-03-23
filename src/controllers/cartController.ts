@@ -52,6 +52,12 @@ export const viewCart = async (req: AuthenticatedRequest, res: Response) => {
 
         const cart = await prisma.cart.findMany({
             where: { userId },
+            select: {
+                productId: true,
+                quantity: true,
+                size: true,
+                color: true,
+            },
          
         });
 
