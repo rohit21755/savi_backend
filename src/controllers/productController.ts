@@ -116,7 +116,7 @@ export const addProduct = async (req: Request, res: Response) => {
 
   export const getAllReviews = async (req: Request, res: Response) => {
     try {
-      const productId = req.params.id;
+      const productId = req.body.productId;
       const reviews = await prisma.review.findMany({
         where: {
           productId: Number(productId),

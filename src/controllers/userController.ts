@@ -89,19 +89,28 @@ export const loginUser = async (req: Request, res: Response) => {
 
 export const addReview = async (req: AuthenticatedRequest, res: Response): Promise<void> => {
     try {
-        const { title, description, rating, email, pruductId } = req.body;
+        const { title, description, rating,  productId } = req.body;
         const userId   = req.userDetails?.id;
         if (!userId) {
             res.status(401).json({ message: "User not authenticated" });
             return
         }
+        const userName = await prisma.user.findUnique({
+            where: {
+                id: userId
+            },
+            select: {
+                name: true
+            }
+        })
         const review = await prisma.review.create({
             data: {
                 title,
                 description,
                 rating,
-                productId: pruductId,
+                productId,
                 userId,
+                userName: userName?.name || ""
             }
         })
         res.status(200).json({ message: "Review added successfully", review });

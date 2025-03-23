@@ -37,7 +37,7 @@ const upload = multer({
 router.post("/add", addProduct);
 router.post("/add-variant",upload.array("variants", 5), addProductVariant);
 router.get("/all", getAllProducts);
-router.get("/reviews", getAllReviews);
+router.post("/reviews", getAllReviews);
 
 
 export default router;
