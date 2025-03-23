@@ -15,7 +15,7 @@ model User {
   phoneNumber String
   isAdmin     Boolean    @default(false)
   address     Address[]
-  cart        Cart?
+  cart        Cart[]
   wishlist    Wishlist[]
 }
 
@@ -78,21 +78,19 @@ model Product {
 }
 
 model Cart {
-  id        Int        @id @default(autoincrement())
-  userId    Int        @unique
-  user      User       @relation(fields: [userId], references: [id])
-  cartItems CartItem[]
-}
-
-model CartItem {
   id        Int     @id @default(autoincrement())
-  cartId    Int
   productId Int
+  userId    Int
   quantity  Int     @default(1)
   size      String?
   color     String?
-  cart      Cart    @relation(fields: [cartId], references: [id])
+  user      User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+
 }
+
+
+
+
 
 model Token {
   id               Int    @id @default(autoincrement())

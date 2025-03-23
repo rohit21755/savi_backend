@@ -3,7 +3,6 @@ import prisma from "../prisma-client";
 import { AuthenticatedRequest } from "../types/User";
 import { z } from "zod";
 
-
 const cartSchema = z.object({
     productId: z.number(),
     quantity: z.number().optional().default(1),
@@ -20,34 +19,18 @@ export const addToCart = async (req: AuthenticatedRequest, res: Response) => {
 
         const { productId, quantity, size, color } = cartSchema.parse(req.body);
 
-        let cart = await prisma.cart.findUnique({
-            where: { userId },
-            include: { cartItems: true },
-        });
-
-        if (!cart) {
-            cart = await prisma.cart.create({
-                data: { userId },
-                include: { cartItems: true },
-            });
-        }
-
-        if (!cart) {
-            return res.status(500).json({ message: "Failed to create cart" });
-        }
-
-        const existingItem = await prisma.cartItem.findFirst({
-            where: { cartId: cart.id, productId, size, color },
+        const existingItem = await prisma.cart.findFirst({
+            where: { userId, productId, size, color },
         });
 
         if (existingItem) {
-            await prisma.cartItem.update({
+            await prisma.cart.update({
                 where: { id: existingItem.id },
                 data: { quantity: existingItem.quantity + quantity },
             });
         } else {
-            await prisma.cartItem.create({
-                data: { cartId: cart.id, productId, quantity, size, color },
+            await prisma.cart.create({
+                data: { userId, productId, quantity, size, color },
             });
         }
 
@@ -67,14 +50,10 @@ export const viewCart = async (req: AuthenticatedRequest, res: Response) => {
             return res.status(401).json({ message: "User not authenticated" });
         }
 
-        const cart = await prisma.cart.findUnique({
+        const cart = await prisma.cart.findMany({
             where: { userId },
-            include: { cartItems: true },
+         
         });
-
-        if (!cart || cart.cartItems.length === 0) {
-            return res.status(404).json({ message: "Cart is empty" });
-        }
 
         res.status(200).json({ cart });
     } catch (error) {
@@ -92,21 +71,20 @@ export const removeFromCart = async (req: AuthenticatedRequest, res: Response) =
             return res.status(401).json({ message: "User not authenticated" });
         }
 
-        const cartItemId = parseInt(req.params.id, 10);
+        const cartItemId = req.body.cartItemId;
         if (isNaN(cartItemId)) {
             return res.status(400).json({ message: "Invalid cart item ID" });
         }
 
-        const cartItem = await prisma.cartItem.findUnique({
+        const cartItem = await prisma.cart.findUnique({
             where: { id: cartItemId },
-            include: { cart: true },
         });
 
-        if (!cartItem || cartItem.cart.userId !== userId) {
+        if (!cartItem || cartItem.userId !== userId) {
             return res.status(403).json({ message: "Unauthorized to remove this item" });
         }
 
-        await prisma.cartItem.delete({
+        await prisma.cart.delete({
             where: { id: cartItemId },
         });
 

@@ -13,7 +13,7 @@ router.get("/", isUserAuthenticated, async (req, res) => {
     await viewCart(req as AuthenticatedRequest, res);
 });
 
-router.delete("/:id", isUserAuthenticated, async (req, res) => {
+router.delete("/", isUserAuthenticated, async (req, res) => {
     await removeFromCart(req as AuthenticatedRequest, res);
 });
 
