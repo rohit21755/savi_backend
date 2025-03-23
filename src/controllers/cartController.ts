@@ -20,7 +20,7 @@ export const addToCart = async (req: AuthenticatedRequest, res: Response) => {
         const { productId, quantity, size, color } = cartSchema.parse(req.body);
 
         const existingItem = await prisma.cart.findFirst({
-            where: { userId, productId, size, color },
+            where: { userId, productId, size },
         });
 
         if (existingItem) {
@@ -30,7 +30,7 @@ export const addToCart = async (req: AuthenticatedRequest, res: Response) => {
             });
         } else {
             await prisma.cart.create({
-                data: { userId, productId, quantity, size, color },
+                data: { userId, productId, quantity, size },
             });
         }
 
@@ -53,10 +53,11 @@ export const viewCart = async (req: AuthenticatedRequest, res: Response) => {
         const cart = await prisma.cart.findMany({
             where: { userId },
             select: {
+                id: true,
                 productId: true,
                 quantity: true,
                 size: true,
-                color: true,
+
             },
          
         });

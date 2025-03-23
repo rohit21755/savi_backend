@@ -83,7 +83,6 @@ model Cart {
   userId    Int
   quantity  Int     @default(1)
   size      String?
-  color     String?
   user      User    @relation(fields: [userId], references: [id], onDelete: Cascade)
 
 }
