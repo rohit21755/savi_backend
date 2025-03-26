@@ -36,7 +36,7 @@ class PhonePeTokenManager {
 
     private async fetchNewToken(): Promise<PhonePeTokenResponse> {
         const requiredEnvVars = [
-            'PHONEPE_AUTHTOKEN_URL', 
+            'PHONEPE_AUTHTOKEN_URL_PROD', 
             'PHONEPE_CLIENT_ID', 
             'PHONEPE_CLIENT_SECRET'
         ];
@@ -53,10 +53,10 @@ class PhonePeTokenManager {
                 client_version: '1',
                 client_secret: process.env.PHONEPE_CLIENT_SECRET!,
                 grant_type: 'client_credentials'
-            }).toString();
+            });
 
             const response = await axios.post<PhonePeTokenResponse>(
-                process.env.PHONEPE_AUTHTOKEN_URL!, 
+               "https://api.phonepe.com/apis/identity-manager/v1/oauth/token", 
                 data, 
                 {
                     headers: {
