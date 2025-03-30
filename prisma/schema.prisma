@@ -88,15 +88,29 @@ model Cart {
 
 }
 
-
-
-
-
-model Token {
-  id               Int    @id @default(autoincrement())
-  Token            String
-  EncryptedToken   String
-  issuedAt         BigInt
-  expiresAt        BigInt
-  sessionExpiredAt BigInt
+model Order {
+  id          Int       @id @default(autoincrement())
+  userId      Int
+  addressId   Int
+  address     String
+  state       String    @default("pending") // Possible values: pending, shipped, delivered, canceled
+  paid        Boolean   @default(false)
+  totalAmount Float
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  orderItems  OrderItem[]
 }
+
+model OrderItem {
+  id        Int      @id @default(autoincrement())
+  orderId   Int
+  productId Int
+  order     Order    @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  quantity  Int      @default(1)
+  price     Float    // Price at the time of order (to keep historical data)
+  size      String?
+}
+ 
+
+
+
