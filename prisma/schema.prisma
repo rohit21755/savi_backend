@@ -17,6 +17,7 @@ model User {
   address     Address?
   cart        Cart[]
   wishlist    Wishlist[]
+  orders      Order[]
 }
 
 model Wishlist {
@@ -94,10 +95,11 @@ model Order {
   address     String
   state       String    @default("pending") 
   paid        Boolean   @default(false)
+  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
   totalAmount Float
   createdAt   DateTime  @default(now())
-  updatedAt   DateTime  @updatedAt
   orderItems  OrderItem[]
+  merchantOrderId String @unique
 }
 
 model OrderItem {
@@ -105,6 +107,27 @@ model OrderItem {
   orderId   Int
   productId Int
   order     Order    @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  quantity  Int      @default(1)
+  price     Float    
+  size      String?
+}
+
+model TempOrders {
+  id        Int      @id @default(autoincrement())
+  userId    Int
+  address   String
+  state     String    @default("pending") 
+  paid      Boolean   @default(false)
+  totalAmount Float
+  createdAt DateTime  @default(now())
+  tempOrderItems  TempOrdersItem[]
+  merchantOrderId String @unique
+}
+model TempOrdersItem {
+  id        Int      @id @default(autoincrement())
+  tempOrdersId Int
+  productId Int
+  tempOrders     TempOrders    @relation(fields: [tempOrdersId], references: [id], onDelete: Cascade)
   quantity  Int      @default(1)
   price     Float    
   size      String?
