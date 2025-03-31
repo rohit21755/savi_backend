@@ -38,11 +38,12 @@ export const createOrder = async (req: AuthenticatedRequest, res: Response): Pro
                     tempOrdersId: tempOrders.id,
                     productId: orderItem.productId,
                     quantity: orderItem.quantity,
-                    price: orderItem.price
+                    price: orderItem.price,
+                    size: orderItem.size,
                 }
             })
         }
-        const redirectUrl = `${process.env.PROD_URL_WEB}/payment/check`;
+        const redirectUrl = `${process.env.PROD_URL_WEB}/checkout/${merhcartOrderId}`;
         const requestPay = StandardCheckoutPayRequest.builder()
         .merchantOrderId(merhcartOrderId)
         .amount(amount)
