@@ -5,11 +5,11 @@ import { Request } from "express";
 import { AuthenticatedRequest } from "../types/User";
 
 const router = express.Router();
-router.post("/", isUserAuthenticated, (req, res): Promise<void> => 
+router.post("/create", isUserAuthenticated, (req, res): Promise<void> => 
     createAddress(req as AuthenticatedRequest, res));
 router.get("/", isUserAuthenticated, (req, res): Promise<void> => 
     getAddress(req as AuthenticatedRequest, res));
-router.put("/", isUserAuthenticated, (req, res) => 
+router.put("/update", isUserAuthenticated, (req, res) => 
     updateAddress(req as AuthenticatedRequest, res));
 router.delete("/", isUserAuthenticated, (req, res) => 
     deleteAddress(req as AuthenticatedRequest, res));

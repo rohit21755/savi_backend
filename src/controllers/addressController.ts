@@ -21,7 +21,8 @@ export const createAddress = async (req: AuthenticatedRequest, res: Response): P
         }
 
         const newAddress = await prisma.address.create({
-            data: { address, state, city, zip, userId }
+            data: { address, state, city, zip, userId },
+           
         });
 
         res.status(201).json({ message: "Address saved successfully", address: newAddress });
