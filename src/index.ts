@@ -10,7 +10,9 @@ import wishlistRoutes from "./routes/wishlist";
 import productRoutes from "./routes/product";
 dotenv.config();
 const app = express();
-app.use(cors());
+app.use(cors({
+  origin: "*"
+}));
 app.use(express.json());
 
 app.get("/", (req, res) => {
