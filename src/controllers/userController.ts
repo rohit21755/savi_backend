@@ -71,7 +71,7 @@ export const loginUser = async (req: Request, res: Response) => {
                         name: user.name,
                         email: user.email,
                         phoneNumber: user.phoneNumber,
-                        address: user.address?.address
+                        address: user.address
                     }
                 })
             }
