@@ -49,8 +49,11 @@ export const loginUser = async (req: Request, res: Response) => {
             where:{
                 email
             },
-            include: { address: true, }
+            include: {
+                address: true
+            }
         })
+        
         if(!user){
             res.status(400).json({
                 message: 'User not found',
@@ -68,7 +71,7 @@ export const loginUser = async (req: Request, res: Response) => {
                         name: user.name,
                         email: user.email,
                         phoneNumber: user.phoneNumber,
-                        
+                        address: user.address?.address
                     }
                 })
             }
@@ -165,7 +168,7 @@ export const updateProfile = async (req: AuthenticatedRequest, res: Response): P
                 name: updatedUser.name,
                 email: updatedUser.email,
                 phoneNumber: updatedUser.phoneNumber,
-                address: updatedUser.address.map((addr: { address: string }) => addr.address)
+                address: updatedUser.address?.address
             }
         });
     } catch (error) {

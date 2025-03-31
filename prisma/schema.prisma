@@ -14,7 +14,7 @@ model User {
   password    String
   phoneNumber String
   isAdmin     Boolean    @default(false)
-  address     Address[]
+  address     Address?
   cart        Cart[]
   wishlist    Wishlist[]
 }
@@ -32,8 +32,8 @@ model Address {
   city    String
   state   String
   zip     Int
-  userId  Int
-  user    User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId  Int     @unique
+  user    User    @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
 model Review {
@@ -91,9 +91,8 @@ model Cart {
 model Order {
   id          Int       @id @default(autoincrement())
   userId      Int
-  addressId   Int
   address     String
-  state       String    @default("pending") // Possible values: pending, shipped, delivered, canceled
+  state       String    @default("pending") 
   paid        Boolean   @default(false)
   totalAmount Float
   createdAt   DateTime  @default(now())
@@ -107,7 +106,7 @@ model OrderItem {
   productId Int
   order     Order    @relation(fields: [orderId], references: [id], onDelete: Cascade)
   quantity  Int      @default(1)
-  price     Float    // Price at the time of order (to keep historical data)
+  price     Float    
   size      String?
 }
  
