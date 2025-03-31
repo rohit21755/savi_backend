@@ -11,7 +11,8 @@ import productRoutes from "./routes/product";
 dotenv.config();
 const app = express();
 app.use(cors({
-  origin: "*"
+  origin: "*",
+  methods: "GET,POST,PUT,DELETE",
 }));
 app.use(express.json());
 
