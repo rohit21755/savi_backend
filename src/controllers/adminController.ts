@@ -187,3 +187,158 @@ export const updateProductSale = async (req: Request, res: Response): Promise<vo
         res.status(500).json({ message: "Failed to update product sale", error: error instanceof Error ? error.message : error });
     }
 };
+
+const priceSchema = z.object({
+    price: z.number().positive(),
+})
+
+export const updateProductPrice = async (req: Request, res: Response): Promise<void> => {
+    try {
+        const productId = parseInt(req.params.id);
+
+        if(isNaN(productId)) {
+            res.status(400).json({ message: "Invalid product ID" });
+            return;
+        }
+
+        const validatedData = priceSchema.safeParse(req.body);
+        if (!validatedData.success) {
+            res.status(400).json({ message: "Invalid price data", error: validatedData.error.errors });
+            return;
+        }
+
+        const { price } = validatedData.data;
+
+        const product = await prisma.product.findUnique({ where: { id: productId } });
+
+        if (!product) {
+            res.status(404).json({ message: "Product not found" });
+            return;
+        }
+
+        const updatedProduct = await prisma.product.update({
+            where: { id: productId },
+            data: { price }
+        });
+
+        res.status(200).json({
+            message: "Product price updated successfully",
+            product: updatedProduct
+        });
+    } catch (error) {
+        res.status(500).json({
+            message: "Failed to update product price",
+            error: error instanceof Error ? error.message: error
+        });
+    }
+};
+
+const changeStatusSchema = z.object({
+    upForChange: z.boolean(),
+});
+
+export const updateProductChangeStatus = async (req: Request, res: Response): Promise<void> => {
+    try {
+        const productId = parseInt(req.params.id);
+
+        if (isNaN(productId)) {
+            res.status(400).json({ message: "Invalid product ID" });
+            return;
+        }
+
+        const validatedData = changeStatusSchema.safeParse(req.body);
+        if (!validatedData.success) {
+            res.status(400).json({ message: "Invalid request data", error: validatedData.error.errors });
+            return;
+        }
+
+        const { upForChange } = validatedData.data;
+
+        const product = await prisma.product.findUnique({ where: { id: productId } });
+
+        if (!product) {
+            res.status(404).json({ message: "Product not found" });
+            return;
+        }
+
+        const updatedProduct = await prisma.product.update({
+            where: { id: productId },
+            data: { upForChange },
+        });
+
+        res.status(200).json({
+            message: `Product is ${upForChange ? "now" : "no longer"} up for change`,
+            product: updatedProduct,
+        });
+    } catch (error) {
+        res.status(500).json({
+            message: "Failed to update product change status",
+            error: error instanceof Error ? error.message : error,
+        });
+    }
+};
+
+export const getOrdersByState = async (req: Request, res: Response): Promise<void> => {
+    try {
+
+        const orders = await prisma.order.findMany();
+
+        const groupedOrders = orders.reduce((acc: Record<string, any[]>, order) => {
+            if (!acc[order.state]) {
+                acc[order.state] = [];
+            }
+            acc[order.state].push(order);
+            return acc;
+        }, {});
+
+        res.status(200).json(groupedOrders);
+    } catch (error) {
+        console.error('Error fetching orders:', error);
+        res.status(500).json({ message: 'Failed to fetch orders', error: error instanceof Error ? error.message : error });
+    }
+};
+
+const orderStateSchema = z.object({
+    state: z.enum(["pending", "shipped", "delivered", "canceled"]) // Adjust kr diyo jo jo use karra hai values
+});
+
+export const updateOrderState = async (req: Request, res: Response): Promise<void> => {
+    try {
+        const orderId = parseInt(req.params.id);
+
+        if (isNaN(orderId)) {
+            res.status(400).json({ message: "Invalid order ID" });
+            return;
+        }
+
+        const validatedData = orderStateSchema.safeParse(req.body);
+        if (!validatedData.success) {
+            res.status(400).json({ message: "Invalid state", error: validatedData.error.errors });
+            return;
+        }
+
+        const { state } = validatedData.data;
+
+        const order = await prisma.order.findUnique({ where: { id: orderId } });
+
+        if (!order) {
+            res.status(404).json({ message: "Order not found" });
+            return;
+        }
+
+        const updatedOrder = await prisma.order.update({
+            where: { id: orderId },
+            data: { state }
+        });
+
+        res.status(200).json({
+            message: "Order state updated successfully",
+            order: updatedOrder
+        });
+    } catch (error) {
+        res.status(500).json({
+            message: "Failed to update order state",
+            error: error instanceof Error ? error.message : error
+        });
+    }
+};

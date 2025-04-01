@@ -178,3 +178,57 @@ export const updateProfile = async (req: AuthenticatedRequest, res: Response): P
         });
     }
 };
+
+export const getOrders = async (req: AuthenticatedRequest, res: Response): Promise<void> => {
+    try {
+        const userId = req.userDetails?.id;
+
+        if (!userId) {
+            res.status(401).json({ message: "User not authenticated" });
+            return;
+        }
+
+        const orders = await prisma.order.findMany({
+            where: { userId },
+            include: {
+                orderItems: {
+                    include: {
+                        order: true
+                    }
+                }
+            },
+            orderBy: {
+                createdAt: 'desc'
+            }
+        });
+
+        res.status(200).json({ message: "Orders retrieved successfully", orders });
+    } catch (error) {
+        res.status(500).json({
+            message: "Failed to fetch orders",
+            error: error instanceof Error ? error.message : "An unknown error occurred"
+        });
+    }
+};
+
+export const emptyCart = async (req: AuthenticatedRequest, res: Response): Promise<void> => {
+    try {
+        const userId = req.userDetails?.id;
+
+        if (!userId) {
+            res.status(401).json({ message: "User not authenticated" });
+            return;
+        }
+
+        await prisma.cart.deleteMany({
+            where: { userId }
+        });
+
+        res.status(200).json({ message: "Cart emptied successfully" });
+    } catch (error) {
+        res.status(500).json({
+            message: "Failed to empty cart",
+            error: error instanceof Error ? error.message : "An unknown error occurred"
+        });
+    }
+};

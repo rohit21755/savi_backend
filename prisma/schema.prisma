@@ -77,6 +77,7 @@ model Product {
   category      String[]
   reviews       Review[]
   variants      Variant[]
+  upForChange   Boolean @default(false)
 }
 
 model Cart {
