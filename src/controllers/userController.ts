@@ -212,7 +212,8 @@ export const getOrders = async (req: AuthenticatedRequest, res: Response): Promi
             ...order,
             orderItems: order.orderItems.map(item => ({
                 ...item,
-                productImage: products.find(product => product.id === item.productId)?.variants[0].images[0]
+                productImage: products.find(product => product.id === item.productId)?.variants[0].images[0],
+                productName: products.find(product => product.id === item.productId)?.name,
             }))
         }));
 
