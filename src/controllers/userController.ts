@@ -191,18 +191,32 @@ export const getOrders = async (req: AuthenticatedRequest, res: Response): Promi
         const orders = await prisma.order.findMany({
             where: { userId },
             include: {
-                orderItems: {
-                    include: {
-                        order: true
-                    }
-                }
+                orderItems: true
             },
             orderBy: {
                 createdAt: 'desc'
             }
         });
 
-        res.status(200).json({ message: "Orders retrieved successfully", orders });
+        // Fetch product details separately
+        const productIds = orders.flatMap(order => order.orderItems.map(item => item.productId));
+        const products = await prisma.product.findMany({
+            where: { id: { in: productIds } },
+            include: {
+                variants: true
+            }
+        });
+
+        // Map product details to order items
+        const ordersWithProducts = orders.map(order => ({
+            ...order,
+            orderItems: order.orderItems.map(item => ({
+                ...item,
+                productImage: products.find(product => product.id === item.productId)?.variants[0].images[0]
+            }))
+        }));
+
+        res.status(200).json({ message: "Orders retrieved successfully", orders: ordersWithProducts });
     } catch (error) {
         res.status(500).json({
             message: "Failed to fetch orders",
@@ -210,6 +224,7 @@ export const getOrders = async (req: AuthenticatedRequest, res: Response): Promi
         });
     }
 };
+
 
 export const emptyCart = async (req: AuthenticatedRequest, res: Response): Promise<void> => {
     try {
