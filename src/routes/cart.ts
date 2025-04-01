@@ -5,7 +5,7 @@ import { AuthenticatedRequest } from "../types/User";
 
 const router = express.Router();
 
-router.post("/", isUserAuthenticated, async (req, res) => {
+router.post("/add", isUserAuthenticated, async (req, res) => {
     await addToCart(req as AuthenticatedRequest, res);
 });
 
@@ -13,7 +13,7 @@ router.get("/", isUserAuthenticated, async (req, res) => {
     await viewCart(req as AuthenticatedRequest, res);
 });
 
-router.delete("/", isUserAuthenticated, async (req, res) => {
+router.delete("/delete", isUserAuthenticated, async (req, res) => {
     await removeFromCart(req as AuthenticatedRequest, res);
 });
 

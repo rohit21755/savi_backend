@@ -87,7 +87,9 @@ export const removeFromCart = async (req: AuthenticatedRequest, res: Response) =
             where: { id: cartItemId },
         });
 
-       
+        if (!cartItem || cartItem.userId !== Number(userId)) {
+            return res.status(403).json({ message: "Unauthorized to remove this item" });
+        }
 
         await prisma.cart.delete({
             where: { id: cartItemId },
