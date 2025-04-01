@@ -16,7 +16,7 @@ const client = StandardCheckoutClient.getInstance(clientId, clientSecret,Number(
 export const createOrder = async (req: AuthenticatedRequest, res: Response): Promise<void> => {
     try {
         const { address, totalAmount, orderItems } = req.body;
-        const amount = 10 * 100;
+        const amount = totalAmount * 100;
         const userId   = req.userDetails?.id;
         if (!userId) {
             res.status(401).json({ message: "User not authenticated" });
