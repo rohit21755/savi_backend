@@ -176,7 +176,6 @@ export const updateProductSale = async (req: Request, res: Response): Promise<vo
             data: {
                 sale,
                 salePrice: sale ? salePrice : undefined,
-                price: salePrice
             }
         });
 
