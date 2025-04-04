@@ -144,7 +144,7 @@ export const deleteVariant = async (req: Request, res: Response): Promise<void> 
 
 const saleSchema = z.object({
     sale: z.boolean(),
-    salePrice: z.number().positive()
+    salePrice: z.number()
 });
 
 export const updateProductSale = async (req: Request, res: Response): Promise<void> => {
@@ -281,17 +281,56 @@ export const updateProductChangeStatus = async (req: Request, res: Response): Pr
 export const getOrdersByState = async (req: Request, res: Response): Promise<void> => {
     try {
 
-        const orders = await prisma.order.findMany();
-
-        const groupedOrders = orders.reduce((acc: Record<string, any[]>, order) => {
-            if (!acc[order.state]) {
-                acc[order.state] = [];
+        const orders = await prisma.order.findMany({
+            include: {
+                orderItems: true    
             }
-            acc[order.state].push(order);
-            return acc;
-        }, {});
+        });
 
-        res.status(200).json(groupedOrders);
+        const newOrders = await Promise.all(orders.map(async order => {
+            console.log("Processing Order ID:", order.id);
+        
+            if (!order.orderItems || order.orderItems.length === 0) {
+                console.log("No order items found for order ID:", order.id);
+                return { ...order, orderItems: [] };
+            }
+        
+            const orderItems = await Promise.all(order.orderItems.map(async orderItem => {
+                console.log("Fetching product for OrderItem ID:", orderItem.id, "Product ID:", orderItem.productId);
+        
+                const product = await prisma.product.findUnique({
+                    where: { id: orderItem.productId },
+                    include: { variants: true } // Fetching variants
+                });
+        
+                if (!product) {
+                    console.log("Product not found for ID:", orderItem.productId);
+                    return { ...orderItem, product: null };
+                }
+        
+                // Extract product name and variant images
+                const productName = product.name;
+                const variantImages = product.variants.map(variant => variant.images).flat(); // Flatten array of images
+        
+                return {
+                    ...orderItem,
+                    product: {
+                        id: product.id,
+                        name: productName,
+                        variants: variantImages // Only include variant images
+                    }
+                };
+            }));
+        
+            return { ...order, orderItems };
+        }));
+        
+        console.log("Final Processed Orders:", JSON.stringify(newOrders, null, 2));
+        
+
+        
+
+        res.status(200).json(newOrders);
     } catch (error) {
         console.error('Error fetching orders:', error);
         res.status(500).json({ message: 'Failed to fetch orders', error: error instanceof Error ? error.message : error });
@@ -299,7 +338,7 @@ export const getOrdersByState = async (req: Request, res: Response): Promise<voi
 };
 
 const orderStateSchema = z.object({
-    state: z.enum(["pending", "shipped", "delivered", "canceled"]) // Adjust kr diyo jo jo use karra hai values
+    state: z.enum(['pending', 'confirmed', 'in transit', 'delivered', 'cancelled']) 
 });
 
 export const updateOrderState = async (req: Request, res: Response): Promise<void> => {

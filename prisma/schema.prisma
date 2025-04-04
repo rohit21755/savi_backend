@@ -101,6 +101,13 @@ model Order {
   createdAt   DateTime  @default(now())
   orderItems  OrderItem[]
   merchantOrderId String @unique
+  delverdAt DateTime?
+  delivered Boolean @default(false)
+  cancelled Boolean @default(false)
+  cancelledAt DateTime?
+  cancelledBy String?
+  refunded Boolean @default(false)
+  refundedAt DateTime?
 }
 
 model OrderItem {
@@ -132,6 +139,21 @@ model TempOrdersItem {
   quantity  Int      @default(1)
   price     Float    
   size      String?
+}
+
+model RefundedOrders {
+  id Int @id @default(autoincrement())
+  orderId Int
+  userId Int
+  merchantOrderId String @unique
+  merchantRefundId String @unique
+  amount Float
+  createdAt DateTime  @default(now())
+  refundedAt DateTime?
+  cancelled Boolean @default(false)
+  returned Boolean @default(false)
+  pickedUp Boolean @default(false)
+  state String @default("pending")
 }
  
 
