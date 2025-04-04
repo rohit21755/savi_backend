@@ -5,7 +5,7 @@ import { AuthenticatedRequest } from '../types/User';
 
 const router = express.Router();
 
-router.post('/dd', isUserAuthenticated, async (req, res) => {
+router.post('/add', isUserAuthenticated, async (req, res) => {
     await addToWishlist(req as AuthenticatedRequest, res);
 });
 
