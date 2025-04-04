@@ -7,6 +7,19 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+enum OrderState {
+  PENDING
+  PROCESSING
+  SHIPPED
+  DELIVERED
+  CANCELLATION_REQUESTED
+  CANCELLED
+  RETURN_REQUESTED
+  RETURN_APPROVED
+  RETURN_REJECTED
+  REFUND_PENDING
+  REFUNDED
+}
 model User {
   id          Int        @id @default(autoincrement())
   name        String
@@ -105,8 +118,11 @@ model Order {
   delivered Boolean @default(false)
   cancelled Boolean @default(false)
   cancelledAt DateTime?
+  returnRequested Boolean @default(false)
+  returnedAt DateTime?
   refunded Boolean @default(false)
   refundedAt DateTime?
+  
 }
 
 model OrderItem {

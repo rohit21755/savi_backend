@@ -258,7 +258,7 @@ export const retrunOrder = async (req: AuthenticatedRequest, res: Response): Pro
     }
     const order = await prisma.order.findUnique({
         where: {    
-            id: orderId,
+            id: Number(orderId),
             merchantOrderId: String(merchantOrderId),
         }
     });
@@ -272,18 +272,18 @@ export const retrunOrder = async (req: AuthenticatedRequest, res: Response): Pro
     }
     try
   {  await prisma.order.update({
-        where: { id: orderId },
-        data: { state: "returned" }
+        where: { id: Number(orderId) },
+        data: { state: "returned", refundedAt: new Date(), refunded: false, returnRequested: true, returnedAt: new Date() }
     });
 
     await prisma.refundedOrders.create({
         data: {
-            orderId: orderId,
+            orderId: Number(orderId),
             userId: userId,
             merchantOrderId: merchantOrderId,
             amount: order.totalAmount,
             createdAt: new Date(),
-            state: "returned"
+            state: "pickup"
         }
     });
 
@@ -306,7 +306,7 @@ export const cancelOrder = async (req: AuthenticatedRequest, res: Response): Pro
     }
     const order = await prisma.order.findUnique({
         where: {    
-            id: orderId,
+            id: Number(orderId),
             merchantOrderId: String(merchantOrderId),
         }
     });
@@ -317,13 +317,13 @@ export const cancelOrder = async (req: AuthenticatedRequest, res: Response): Pro
     }
     try
   {  await prisma.order.update({
-        where: { id: orderId },
-        data: { state: "cancelled" }
+        where: { id: Number(orderId) },
+        data: { state: "cancelled", cancelled: true, cancelledAt: new Date() }
     });
 
     await prisma.refundedOrders.create({
         data: {
-            orderId: orderId,
+            orderId: Number(orderId),
             userId: userId,
             merchantOrderId: merchantOrderId,
             amount: order.totalAmount,

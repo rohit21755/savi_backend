@@ -175,7 +175,8 @@ export const updateProductSale = async (req: Request, res: Response): Promise<vo
             where: { id: productId },
             data: {
                 sale,
-                salePrice: sale ? salePrice : undefined
+                salePrice: sale ? salePrice : undefined,
+                price: salePrice
             }
         });
 
@@ -367,7 +368,7 @@ export const updateOrderState = async (req: Request, res: Response): Promise<voi
         if(state === "delivered") {
             await prisma.order.update({
                 where: { id: orderId },
-                data: { state, delverdAt: new Date() }
+                data: { state, delverdAt: new Date(), delivered: true }
             });
         }
         else {
