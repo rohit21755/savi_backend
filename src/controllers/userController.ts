@@ -248,3 +248,95 @@ export const emptyCart = async (req: AuthenticatedRequest, res: Response): Promi
         });
     }
 };
+
+export const retrunOrder = async (req: AuthenticatedRequest, res: Response): Promise<void> => {
+    const { orderId, merchantOrderId } = req.body;
+    const userId = req.userDetails?.id;
+    if (!userId) {
+        res.status(401).json({ message: "User not authenticated" });
+        return;
+    }
+    const order = await prisma.order.findUnique({
+        where: {    
+            id: orderId,
+            merchantOrderId: String(merchantOrderId),
+        }
+    });
+
+    if (!order) {
+        res.status(404).json({ message: "Order not found" });
+        return;
+    }
+    if(order.state !== "delivered"){
+        res.status(400).json({ message: "Order is not eligible for return" });
+    }
+    try
+  {  await prisma.order.update({
+        where: { id: orderId },
+        data: { state: "returned" }
+    });
+
+    await prisma.refundedOrders.create({
+        data: {
+            orderId: orderId,
+            userId: userId,
+            merchantOrderId: merchantOrderId,
+            amount: order.totalAmount,
+            createdAt: new Date(),
+            state: "returned"
+        }
+    });
+
+    res.status(200).json({ message: "Order returned successfully" });}
+    catch (error) {
+        res.status(500).json({
+            message: "Failed to return order",
+            error: error instanceof Error ? error.message : "An unknown error occurred"
+        });
+    }   
+   
+}
+
+export const cancelOrder = async (req: AuthenticatedRequest, res: Response): Promise<void> => {
+    const { orderId, merchantOrderId } = req.body;
+    const userId = req.userDetails?.id;
+    if (!userId) {
+        res.status(401).json({ message: "User not authenticated" });
+        return;
+    }
+    const order = await prisma.order.findUnique({
+        where: {    
+            id: orderId,
+            merchantOrderId: String(merchantOrderId),
+        }
+    });
+    
+    if (!order) {
+        res.status(404).json({ message: "Order not found" });
+        return;
+    }
+    try
+  {  await prisma.order.update({
+        where: { id: orderId },
+        data: { state: "cancelled" }
+    });
+
+    await prisma.refundedOrders.create({
+        data: {
+            orderId: orderId,
+            userId: userId,
+            merchantOrderId: merchantOrderId,
+            amount: order.totalAmount,
+            createdAt: new Date(),
+            state: "cancelled"
+        }
+    });
+
+    res.status(200).json({ message: "Order cancelled successfully" });}
+    catch (error) {
+        res.status(500).json({
+            message: "Failed to cancel order",
+            error: error instanceof Error ? error.message : "An unknown error occurred"
+        });
+    }
+}

@@ -338,7 +338,7 @@ export const getOrdersByState = async (req: Request, res: Response): Promise<voi
 };
 
 const orderStateSchema = z.object({
-    state: z.enum(['pending', 'confirmed', 'in transit', 'delivered', 'cancelled']) 
+    state: z.enum(['pending', 'confirmed', 'in transit', 'delivered', 'cancelled', 'returned']), 
 });
 
 export const updateOrderState = async (req: Request, res: Response): Promise<void> => {
@@ -364,15 +364,23 @@ export const updateOrderState = async (req: Request, res: Response): Promise<voi
             res.status(404).json({ message: "Order not found" });
             return;
         }
+        if(state === "delivered") {
+            await prisma.order.update({
+                where: { id: orderId },
+                data: { state, delverdAt: new Date() }
+            });
+        }
+        else {
+           await prisma.order.update({
+                where: { id: orderId },
+                data: { state }
+            });
+        }
 
-        const updatedOrder = await prisma.order.update({
-            where: { id: orderId },
-            data: { state }
-        });
+        
 
         res.status(200).json({
             message: "Order state updated successfully",
-            order: updatedOrder
         });
     } catch (error) {
         res.status(500).json({

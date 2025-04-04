@@ -56,6 +56,7 @@ export const createOrder = async (req: AuthenticatedRequest, res: Response): Pro
             checkoutPageUrl: response.redirectUrl,
             message: "Order created successfully",
         });
+    
 
     } catch (error) {
         console.error("Error in payment initiation:", error);
@@ -157,7 +158,7 @@ export const refundOrder = async (req: Request, res: Response): Promise<void> =>
     const refundOrderId = merchantOrderId + "-Refund" + randomId + "-" + Date.now();
 
     try{
-        const order = await prisma.order.findUnique({
+        const order = await prisma.refundedOrders.findUnique({
             where: {
                 id: orderId,
                 merchantOrderId: merchantOrderId
@@ -167,28 +168,87 @@ export const refundOrder = async (req: Request, res: Response): Promise<void> =>
             res.status(404).json({ message: "Order not found" });
             return;
         }
-        if(order.state !== "cancelled" && order.state !== "cancelled"){
+        if(order.state !== "cancelled" && order.state !== "returned"){
             res.status(400).json({ message: "Order is not eligible for refund" });
             return;
         }
-        if(order.refunded){
-            res.status(400).json({ message: "Order is already refunded" });
-            return;
-        }
+        
         
         const request = await RefundRequest.builder()
-                    .amount(order.totalAmount * 100)
+                    .amount(1* 100)
                     .merchantRefundId(refundOrderId)
                     .originalMerchantOrderId(merchantOrderId)
                     .build();
 
         const response = await client.refund(request);
-        if (response.state === "PENDING") {}
+        if (response.state === "PENDING") {
+            await prisma.refundedOrders.update({
+                where: {
+                    id: orderId,
+                    merchantOrderId: merchantOrderId
+                },
+                data: {
+                    state: response.state,
+                    merchantRefundId: refundOrderId,
+                }
+            })
+        }
+        
+        res.status(200).json({
+            message: "Refund in Process",
+
+        })
             
 
     }
     catch (error) {
-        
+        res.status(500).json({ message: "Error processing refund", error });
     }
 
+}
+
+export const getRefundStatus = async (req: Request, res: Response): Promise<void> => {
+    const {merchantOrderId} = req.query;
+    if (!merchantOrderId || typeof merchantOrderId !== 'string') {
+        res.status(400).send("MerchantOrderId is required and must be a string");
+        return;
+    }
+    const refundOrder = await prisma.refundedOrders.findUnique({
+        where: {
+            merchantOrderId: String(merchantOrderId)
+        }
+    })
+    if (!refundOrder) {
+        res.status(404).json({ message: "Refund not found" });
+        return;
+    }
+    try{
+        const response = await client.getRefundStatus(String(refundOrder.merchantRefundId));
+        const status = response.state;
+        if (status === "COMPLETED") {
+            await prisma.refundedOrders.update({
+                where: {
+                    id: refundOrder.id,
+                    merchantOrderId: String(merchantOrderId)
+                },
+                data: {
+                    state: status,
+                    refundedAt: new Date()
+                }
+            })
+            res.status(200).json({
+                status: status,
+                message: "Refund completed"
+            })
+        }
+        else if (status === "PENDING") {
+            res.status(200).json({
+                status: status,
+                message: "Refund pending"
+            })
+        }
+    }
+    catch (error) {
+        res.status(500).json({ message: "Error getting refund status", error });
+    }
 }

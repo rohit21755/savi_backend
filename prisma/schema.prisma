@@ -105,7 +105,6 @@ model Order {
   delivered Boolean @default(false)
   cancelled Boolean @default(false)
   cancelledAt DateTime?
-  cancelledBy String?
   refunded Boolean @default(false)
   refundedAt DateTime?
 }
@@ -146,7 +145,7 @@ model RefundedOrders {
   orderId Int
   userId Int
   merchantOrderId String @unique
-  merchantRefundId String @unique
+  merchantRefundId String? @unique
   amount Float
   createdAt DateTime  @default(now())
   refundedAt DateTime?
