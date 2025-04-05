@@ -7,6 +7,6 @@ const router = express.Router();
 //@ts-ignore
 router.post('/create-order',isUserAuthenticated, async(req,res) => await createOrder(req as AuthenticatedRequest, res));
 router.get('/get-payment-status', getPaymentStatus);
-router.post('/refund', refundOrder);
-router.get('/refund-status', refundOrder);
+// router.post('/refund', refundOrder);
+// router.get('/refund-status', refundOrder);
 export default router;

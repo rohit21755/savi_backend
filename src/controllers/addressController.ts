@@ -27,6 +27,7 @@ export const createAddress = async (req: AuthenticatedRequest, res: Response): P
 
         res.status(201).json({ message: "Address saved successfully", address: newAddress });
     } catch (error) {
+        console.log(error);
         res.status(400).json({ message: "Failed to save address", error });
     }
 };
@@ -82,6 +83,7 @@ export const updateAddress = async (req: AuthenticatedRequest, res: Response): P
         
     }
     catch (error) {
+        console.log(error);
         res.status(400).json({
             message: "Failed to update address",
             error: error

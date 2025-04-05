@@ -9,7 +9,7 @@ dotenv.config();
 const clientId = process.env.CLIENT_ID
 const clientSecret = process.env.CLIENT_SECRET;
 const clientVersion = process.env.CLIENT_VERSION;
-const env = Env.PRODUCTION;
+const env = Env.SANDBOX;
 console.log(process.env.CLIENT_ID, process.env.CLIENT_SECRET, process.env.CLIENT_VERSION)
 //@ts-ignore
 const client = StandardCheckoutClient.getInstance(clientId, clientSecret,Number(clientVersion), env)
@@ -158,7 +158,7 @@ export const refundOrder = async (req: Request, res: Response): Promise<void> =>
     const refundOrderId = merchantOrderId + "-Refund" + randomId + "-" + Date.now();
 
     try{
-        const order = await prisma.refundedOrders.findUnique({
+        const order = await prisma.order.findUnique({
             where: {
                 id: orderId,
                 merchantOrderId: merchantOrderId
@@ -174,29 +174,29 @@ export const refundOrder = async (req: Request, res: Response): Promise<void> =>
         }
         
         
-        const request = await RefundRequest.builder()
-                    .amount(1* 100)
-                    .merchantRefundId(refundOrderId)
-                    .originalMerchantOrderId(merchantOrderId)
-                    .build();
+        // const request =  RefundRequest.builder()
+        //             .amount(1* 100)
+        //             .merchantRefundId(refundOrderId)
+        //             .originalMerchantOrderId(merchantOrderId)
+        //             .build();
 
-        const response = await client.refund(request);
-        if (response.state === "PENDING") {
+        // const response = await client.refund(request);
+        // if (response.state === "PENDING") {
             await prisma.refundedOrders.update({
                 where: {
                     id: orderId,
                     merchantOrderId: merchantOrderId
                 },
                 data: {
-                    state: response.state,
+                    state: "PENDING",
                     merchantRefundId: refundOrderId,
                 }
             })
-        }
+            
+        // }
         
         res.status(200).json({
             message: "Refund in Process",
-
         })
             
 
