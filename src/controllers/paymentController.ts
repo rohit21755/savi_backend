@@ -9,7 +9,7 @@ dotenv.config();
 const clientId = process.env.CLIENT_ID
 const clientSecret = process.env.CLIENT_SECRET;
 const clientVersion = process.env.CLIENT_VERSION;
-const env = Env.SANDBOX;
+const env = Env.PRODUCTION;
 console.log(process.env.CLIENT_ID, process.env.CLIENT_SECRET, process.env.CLIENT_VERSION)
 //@ts-ignore
 const client = StandardCheckoutClient.getInstance(clientId, clientSecret,Number(clientVersion), env)
@@ -149,18 +149,16 @@ export const getPaymentStatus = async (req: Request, res: Response): Promise<voi
 
 
 export const refundOrder = async (req: Request, res: Response): Promise<void> => {
-    const { orderId, merchantOrderId } = req.body;
+    const { orderId, merchantOrderId, refundOrderId } = req.body;
     if (!orderId || !merchantOrderId) {
         res.status(400).json({ message: "Order ID and Merchant Order ID are required" });
         return;
     }
-    const randomId = crypto.randomUUID();
-    const refundOrderId = merchantOrderId + "-Refund" + randomId + "-" + Date.now();
-
+    
     try{
         const order = await prisma.order.findUnique({
             where: {
-                id: orderId,
+                id: Number(orderId),
                 merchantOrderId: merchantOrderId
             }
         });
@@ -174,17 +172,10 @@ export const refundOrder = async (req: Request, res: Response): Promise<void> =>
         }
         
         
-        // const request =  RefundRequest.builder()
-        //             .amount(1* 100)
-        //             .merchantRefundId(refundOrderId)
-        //             .originalMerchantOrderId(merchantOrderId)
-        //             .build();
-
-        // const response = await client.refund(request);
-        // if (response.state === "PENDING") {
+     
             await prisma.refundedOrders.update({
                 where: {
-                    id: orderId,
+                    id: Number(orderId),
                     merchantOrderId: merchantOrderId
                 },
                 data: {
@@ -193,7 +184,7 @@ export const refundOrder = async (req: Request, res: Response): Promise<void> =>
                 }
             })
             
-        // }
+      
         
         res.status(200).json({
             message: "Refund in Process",

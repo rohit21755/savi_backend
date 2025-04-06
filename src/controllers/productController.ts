@@ -130,4 +130,20 @@ export const addProduct = async (req: Request, res: Response) => {
       res.status(500).json({ error: "Internal server error" });
     }
   }
+
+
+  export const deleteProduct = async (req: Request, res: Response) => {
+    try {
+      const productId = req.body.productId;
+      await prisma.variant.deleteMany({
+        where: { productId: Number(productId) },
+      });
+      await prisma.product.delete({
+        where: { id: Number(productId) },
+      }); 
+      res.status(200).json({ message: "Product deleted successfully" });
+    } catch (error) {
+      res.status(500).json({ error: error});
+    }
+  }
   

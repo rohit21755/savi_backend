@@ -286,15 +286,16 @@ export const getOrdersByState = async (req: Request, res: Response): Promise<voi
                 orderItems: true    
             }
         });
+       
 
         const newOrders = await Promise.all(orders.map(async order => {
             console.log("Processing Order ID:", order.id);
-        
+            
             if (!order.orderItems || order.orderItems.length === 0) {
                 console.log("No order items found for order ID:", order.id);
                 return { ...order, orderItems: [] };
             }
-        
+           
             const orderItems = await Promise.all(order.orderItems.map(async orderItem => {
                 console.log("Fetching product for OrderItem ID:", orderItem.id, "Product ID:", orderItem.productId);
         
@@ -310,7 +311,8 @@ export const getOrdersByState = async (req: Request, res: Response): Promise<voi
         
                 // Extract product name and variant images
                 const productName = product.name;
-                const variantImages = product.variants.map(variant => variant.images).flat(); // Flatten array of images
+                const variantImages = product.variants.map(variant => variant.images).flat(); 
+                // Flatten array of images
         
                 return {
                     ...orderItem,
@@ -318,19 +320,21 @@ export const getOrdersByState = async (req: Request, res: Response): Promise<voi
                         id: product.id,
                         name: productName,
                         variants: variantImages // Only include variant images
-                    }
+                    },
+                    
+                    
                 };
             }));
         
             return { ...order, orderItems };
         }));
-        
-        console.log("Final Processed Orders:", JSON.stringify(newOrders, null, 2));
-        
 
-        
+        const ordersWithUsers = await Promise.all(newOrders.map(async order => {
+            const user = await prisma.user.findUnique({ where: { id: order.userId }, select: { name: true, email: true, phoneNumber: true } });
+            return { ...order, user };
+        }));
+        res.status(200).json(ordersWithUsers);
 
-        res.status(200).json(newOrders);
     } catch (error) {
         console.error('Error fetching orders:', error);
         res.status(500).json({ message: 'Failed to fetch orders', error: error instanceof Error ? error.message : error });

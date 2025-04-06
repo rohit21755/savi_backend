@@ -1,5 +1,5 @@
 import express, {Request} from "express";
-import { addProduct, addProductVariant, getAllReviews, getAllProducts } from "../controllers/productController";
+import { addProduct, addProductVariant, getAllReviews, getAllProducts, deleteProduct } from "../controllers/productController";
 import { isAdminAuthenticated } from "../middlewares/admin";
 import multer from "multer";
 import multerS3 from "multer-s3";
@@ -38,6 +38,7 @@ router.post("/add", addProduct);
 router.post("/add-variant",upload.array("variants", 5), addProductVariant);
 router.get("/all", getAllProducts);
 router.post("/reviews", getAllReviews);
+router.delete("/delete", deleteProduct);
 
 
 export default router;
