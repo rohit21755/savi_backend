@@ -108,10 +108,12 @@ export const addProduct = async (req: Request, res: Response) => {
       console.log("getAllProducts");
 
       const products = await prisma.product.findMany({
+        
         include: { variants: true, reviews: true },
       });
+      const filteredProducts = products.filter(product => product.variants.length > 0);
     
-      res.status(200).json({ products });
+      res.status(200).json({ products: filteredProducts });
     } catch (error) {
       res.status(500).json({ error: error});
     }
