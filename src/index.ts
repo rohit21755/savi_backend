@@ -15,7 +15,7 @@ app.use(cors({
   methods: "GET,POST,PUT,DELETE",
 }));
 app.use(express.json());
-app.use(express.urlencoded({ limit: "75mb", extended: true }));
+app.use(express.urlencoded({ limit: "110mb", extended: true }));
 app.get("/", (req, res) => {
   res.send("Hello World!");
 });
