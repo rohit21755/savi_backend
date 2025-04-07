@@ -10,6 +10,7 @@ const router = express.Router();
 let imageCounter = 1; // Counter to keep track of image numbers
 
 const upload = multer({
+  limits: { fileSize: 15 * 1024 * 1024 },
   storage: multerS3({
     s3: s3 as unknown as S3,
     bucket: process.env.AWS_BUCKET_NAME as string,
