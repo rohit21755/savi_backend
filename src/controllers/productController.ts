@@ -119,6 +119,22 @@ export const addProduct = async (req: Request, res: Response) => {
     }
   };
 
+  export const getAllProducts2 = async (req: Request, res: Response) => {
+    try {
+      console.log("getAllProducts");
+
+      const products = await prisma.product.findMany({
+        
+        include: { variants: true, reviews: true },
+      });
+     
+    
+      res.status(200).json({ products});
+    } catch (error) {
+      res.status(500).json({ error: error});
+    }
+  };
+
   export const getAllReviews = async (req: Request, res: Response) => {
     try {
       const productId = req.body.productId;
