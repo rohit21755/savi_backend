@@ -17,6 +17,7 @@ export const addProduct = async (req: Request, res: Response) => {
         stock,
         salePrice,
         category,
+        gender,
       } = req.body;
   
     //   const productId = generateUniqueId(name);
@@ -58,7 +59,7 @@ export const addProduct = async (req: Request, res: Response) => {
           stock: parseInt(stock) || 0,
           salePrice: parseFloat(salePrice) || 0,
           category,
-    
+          gender,
         },
         include: { variants: true },
       });
