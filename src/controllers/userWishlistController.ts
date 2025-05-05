@@ -28,13 +28,14 @@ export const addToWishlist = async (req: AuthenticatedRequest, res: Response) =>
         });
 
         if (existingWishlistItem) {
-            return res.status(400).json({ message: 'Product already in wishlist' });
+            return res.status(402).json({ message: 'Product already in wishlist' });
         }
 
         // Add product to wishlist
         await prisma.wishlist.create({
             data: { userId: numericUserId, productId: numericProductId },
         });
+        
 
         res.status(201).json({ message: 'Product added to wishlist successfully' });
 

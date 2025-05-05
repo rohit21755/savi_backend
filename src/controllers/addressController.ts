@@ -75,8 +75,8 @@ export const updateAddress = async (req: AuthenticatedRequest, res: Response): P
         }
 
         const updatedAddress = await prisma.address.update({
-            where: { id },
-            data: { address, city, state, zip }
+            where: { userId: Number(userId) },
+            data: { address, city, state, zip, userId: Number(userId) }
         });
 
         res.status(200).json({ message: "Address updated successfully", address: updatedAddress })
